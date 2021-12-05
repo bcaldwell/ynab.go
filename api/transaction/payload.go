@@ -42,6 +42,6 @@ type PayloadTransaction struct {
 }
 
 type Transactions struct {
-        Transactions []*Transaction `json:"transactions"`
-	ServerKnowledge int `json:"server_knowledge"`
+	Transactions    []*Transaction `json:"transactions"`
+	ServerKnowledge int            `json:"server_knowledge"`
 }

@@ -26,6 +26,7 @@ func TestService_GetTransactions(t *testing.T) {
 		func(req *http.Request) (*http.Response, error) {
 			res := httpmock.NewStringResponse(200, `{
   "data": {
+	"server_knowledge": 1,
     "transactions": [
       {
         "id": "e6ad88f5-6f16-4480-9515-5377012750dd",
@@ -83,30 +84,33 @@ func TestService_GetTransactions(t *testing.T) {
 	expectedSubTransactionPayeeID := "6216ab4b-bb05-4574-b4b5-be2dee26ab0d"
 	expectedSubTransactionCategoryID := "080985e4-4175-43e4-96bb-d207a9d2c8ce"
 
-	expected := []*transaction.Transaction{
-		{
-			ID:           "e6ad88f5-6f16-4480-9515-5377012750dd",
-			Date:         expectedDate,
-			Amount:       int64(-43950),
-			Memo:         &expectedMemo,
-			Cleared:      transaction.ClearingStatusReconciled,
-			Approved:     true,
-			AccountID:    "09eaca5e-6f16-4480-9515-828fb90638f2",
-			AccountName:  "Bank Name",
-			PayeeID:      &expectedPayeeID,
-			PayeeName:    &expectedPayeeName,
-			CategoryID:   &expectedCategoryID,
-			CategoryName: &expectedCategoryName,
-			Deleted:      false,
-			SubTransactions: []*transaction.SubTransaction{
-				{
-					ID:            "9453526b-2f58-4c02-9683-a30c2a1192d7",
-					TransactionID: "e6ad88f5-6f16-4480-9515-5377012750dd",
-					Amount:        int64(-33970),
-					Memo:          &expectedSubTransactionMemo,
-					PayeeID:       &expectedSubTransactionPayeeID,
-					CategoryID:    &expectedSubTransactionCategoryID,
-					Deleted:       false,
+	expected := &transaction.Transactions{
+		ServerKnowledge: 1,
+		Transactions: []*transaction.Transaction{
+			{
+				ID:           "e6ad88f5-6f16-4480-9515-5377012750dd",
+				Date:         expectedDate,
+				Amount:       int64(-43950),
+				Memo:         &expectedMemo,
+				Cleared:      transaction.ClearingStatusReconciled,
+				Approved:     true,
+				AccountID:    "09eaca5e-6f16-4480-9515-828fb90638f2",
+				AccountName:  "Bank Name",
+				PayeeID:      &expectedPayeeID,
+				PayeeName:    &expectedPayeeName,
+				CategoryID:   &expectedCategoryID,
+				CategoryName: &expectedCategoryName,
+				Deleted:      false,
+				SubTransactions: []*transaction.SubTransaction{
+					{
+						ID:            "9453526b-2f58-4c02-9683-a30c2a1192d7",
+						TransactionID: "e6ad88f5-6f16-4480-9515-5377012750dd",
+						Amount:        int64(-33970),
+						Memo:          &expectedSubTransactionMemo,
+						PayeeID:       &expectedSubTransactionPayeeID,
+						CategoryID:    &expectedSubTransactionCategoryID,
+						Deleted:       false,
+					},
 				},
 			},
 		},
@@ -123,6 +127,7 @@ func TestService_GetTransaction(t *testing.T) {
 		func(req *http.Request) (*http.Response, error) {
 			res := httpmock.NewStringResponse(200, `{
   "data": {
+	"server_knowledge": 2,
     "transaction": {
 			"id": "e6ad88f5-6f16-4480-9515-5377012750dd",
 			"date": "2018-03-10",
@@ -1198,11 +1203,16 @@ func TestFilter_ToQuery(t *testing.T) {
 
 	uncategorizedTransaction := transaction.StatusUncategorized
 	unapprovedTransaction := transaction.StatusUnapproved
+	lastKnowledgeOfServer := 1
 
 	table := []struct {
 		Input  transaction.Filter
 		Output string
 	}{
+		{
+			Input:  transaction.Filter{Since: &sinceDate, Type: &unapprovedTransaction, LastKnowledgeOfServer: &lastKnowledgeOfServer},
+			Output: "since_date=2020-02-02&type=unapproved&last_knowledge_of_server=1",
+		},
 		{
 			Input:  transaction.Filter{Since: &sinceDate, Type: &unapprovedTransaction},
 			Output: "since_date=2020-02-02&type=unapproved",
