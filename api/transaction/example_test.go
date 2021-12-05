@@ -84,7 +84,7 @@ func ExampleService_GetTransactions() {
 	transactions, _ := c.Transaction().GetTransactions("<valid_budget_id>", nil)
 	fmt.Println(reflect.TypeOf(transactions))
 
-	// Output: []*transaction.Transaction
+	// Output: *transaction.Transactions
 }
 
 func ExampleService_GetTransactions_filtered() {
@@ -97,7 +97,7 @@ func ExampleService_GetTransactions_filtered() {
 	transactions, _ := c.Transaction().GetTransactions("<valid_budget_id>", f)
 	fmt.Println(reflect.TypeOf(transactions))
 
-	// Output: []*transaction.Transaction
+	// Output: *transaction.Transactions
 }
 
 func ExampleService_GetTransactionsByAccount() {

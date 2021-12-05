@@ -40,3 +40,8 @@ type PayloadTransaction struct {
 	// be 'YNAB:-294230:2015-12-30:2’.
 	ImportID *string `json:"import_id"`
 }
+
+type Transactions struct {
+	Transactions    []*Transaction `json:"transactions"`
+	ServerKnowledge int            `json:"server_knowledge"`
+}

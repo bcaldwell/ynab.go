@@ -25,10 +25,10 @@ type Service struct {
 // GetTransactions fetches the list of transactions from
 // a budget with filtering capabilities
 // https://api.youneedabudget.com/v1#/Transactions/getTransactions
-func (s *Service) GetTransactions(budgetID string, f *Filter) ([]*Transaction, error) {
+func (s *Service) GetTransactions(budgetID string, f *Filter) (*Transactions, error) {
 	resModel := struct {
 		Data struct {
-			Transactions []*Transaction `json:"transactions"`
+			*Transactions
 		} `json:"data"`
 	}{}
 
@@ -257,7 +257,7 @@ func (s *Service) GetTransactionsByPayee(budgetID, payeeID string,
 
 // GetScheduledTransactions fetches the list of scheduled transactions from
 // a budget
-//https://api.youneedabudget.com/v1#/Scheduled_Transactions/getScheduledTransactions
+// https://api.youneedabudget.com/v1#/Scheduled_Transactions/getScheduledTransactions
 func (s *Service) GetScheduledTransactions(budgetID string) ([]*Scheduled, error) {
 	resModel := struct {
 		Data struct {
@@ -291,8 +291,9 @@ func (s *Service) GetScheduledTransaction(budgetID, scheduledTransactionID strin
 
 // Filter represents the optional filter while fetching transactions
 type Filter struct {
-	Since *api.Date
-	Type  *Status
+	Since                 *api.Date
+	Type                  *Status
+	LastKnowledgeOfServer *int
 }
 
 // ToQuery returns the filters as a HTTP query string
@@ -302,8 +303,13 @@ func (f *Filter) ToQuery() string {
 		pairs = append(pairs, fmt.Sprintf("since_date=%s",
 			api.DateFormat(*f.Since)))
 	}
+
 	if f.Type != nil {
 		pairs = append(pairs, fmt.Sprintf("type=%s", string(*f.Type)))
+	}
+
+	if f.LastKnowledgeOfServer != nil {
+		pairs = append(pairs, fmt.Sprintf("last_knowledge_of_server=%s", fmt.Sprint(*f.LastKnowledgeOfServer)))
 	}
 	return strings.Join(pairs, "&")
 }
